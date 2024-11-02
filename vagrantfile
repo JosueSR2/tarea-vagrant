@@ -1,0 +1,31 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    # Usa una caja base de Ubuntu
+    config.vm.box = "ubuntu/bionic64"  # Puedes usar otra versión si lo prefieres
+  
+    # Configura la red privada para acceso a la máquina virtual
+    config.vm.network "private_network", type: "dhcp"
+  
+    # Configura la memoria y CPU de la VM
+    config.vm.provider "virtualbox" do |vb|
+      vb.memory = "512"
+      vb.cpus = 1
+    end
+  
+    # Instala Apache y configura el directorio compartido
+    config.vm.provision "shell", inline: <<-SHELL
+      # Actualiza los paquetes e instala Apache
+      sudo apt-get update
+      sudo apt-get install -y apache2
+  
+      # Configura Apache para leer desde el directorio compartido
+      sudo rm -rf /var/www/html
+      sudo ln -fs /vagrant /var/www/html
+    SHELL
+  
+    # Comparte el directorio actual con /vagrant en la VM
+    config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+  end
+  
